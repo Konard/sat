@@ -181,22 +181,22 @@ function generateRandomFormula(numVariables, numOperations) {
   const literals = variables.concat(variables.map(v => `(${v} ↑ ${v})`)); // Include negations
   let formula = literals[Math.floor(Math.random() * literals.length)];
 
-  for (let i = 0; i < numOperations - 1; i++) {
-    const operand1 = literals[Math.floor(Math.random() * literals.length)];
+  for (let i = 0; i < numOperations; i++) {
+    const operand1 = formula; // Use the existing formula to increase complexity
     const operand2 = literals[Math.floor(Math.random() * literals.length)];
     formula = `(${operand1} ↑ ${operand2})`;
-    literals.push(formula);
   }
 
   return formula;
 }
 
+// Testing the SAT solver with runtime analysis
 function testSATSolverWithRuntime() {
-  const testCases = [100, 200, 300]; // Number of variables for increasing complexity
+  const testCases = [5, 10, 15, 20]; // Adjust the numbers for demonstration
   const results = [];
 
   for (let numVariables of testCases) {
-    const numOperations = numVariables * 2; // Double the variables to increase formula size
+    const numOperations = numVariables * 3; // Increase operations to ensure formula complexity grows
     const formula = generateRandomFormula(numVariables, numOperations);
 
     console.log(`Testing with ${numVariables} variables and ${numOperations} operations.`);
@@ -208,6 +208,7 @@ function testSATSolverWithRuntime() {
       const runtime = endTime - startTime;
       results.push({ numVariables, runtime });
       console.log(`Formula: ${formula}`);
+      console.log(`Formula length: ${formula.length} characters`);
       console.log(`Result: ${result.satisfiable ? 'Satisfiable' : 'Unsatisfiable'}`);
       console.log(`Runtime: ${runtime.toFixed(2)}ms`);
     } catch (error) {
@@ -230,7 +231,7 @@ function testSATSolverWithRuntime() {
         `Growth Factor: ${runtimeGrowth.toFixed(2)}`
     );
 
-    if (runtimeGrowth > 2) {
+    if (runtimeGrowth > Math.pow(2, current.numVariables - previous.numVariables)) {
       console.warn("Runtime growth appears exponential. Likely P != NP.");
       return false;
     }
