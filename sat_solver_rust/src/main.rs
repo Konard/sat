@@ -193,11 +193,6 @@ fn test_small_formulas() {
     }
 }
 
-struct TestCase<'a> {
-    formula: &'a str,
-    expected: &'a str,
-}
-
 // Function to generate a random formula
 fn generate_random_formula(num_variables: usize, num_operations: usize) -> String {
     let variables: Vec<String> = (1..=num_variables)
