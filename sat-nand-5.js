@@ -175,3 +175,70 @@ function testSmallFormulas() {
 
 // Run the small formula tests
 testSmallFormulas();
+
+function generateRandomFormula(numVariables, numOperations) {
+  const variables = Array.from({ length: numVariables }, (_, i) => `arg_${i + 1}`);
+  const literals = variables.concat(variables.map(v => `(${v} ↑ ${v})`)); // Include negations
+  let formula = literals[Math.floor(Math.random() * literals.length)];
+
+  for (let i = 0; i < numOperations - 1; i++) {
+    const operand1 = literals[Math.floor(Math.random() * literals.length)];
+    const operand2 = literals[Math.floor(Math.random() * literals.length)];
+    formula = `(${operand1} ↑ ${operand2})`;
+    literals.push(formula);
+  }
+
+  return formula;
+}
+
+function testSATSolverWithRuntime() {
+  const testCases = [100, 200, 300]; // Number of variables for increasing complexity
+  const results = [];
+
+  for (let numVariables of testCases) {
+    const numOperations = numVariables * 2; // Double the variables to increase formula size
+    const formula = generateRandomFormula(numVariables, numOperations);
+
+    console.log(`Testing with ${numVariables} variables and ${numOperations} operations.`);
+
+    const startTime = performance.now();
+    try {
+      const result = satSolver(formula);
+      const endTime = performance.now();
+      const runtime = endTime - startTime;
+      results.push({ numVariables, runtime });
+      console.log(`Formula: ${formula}`);
+      console.log(`Result: ${result.satisfiable ? 'Satisfiable' : 'Unsatisfiable'}`);
+      console.log(`Runtime: ${runtime.toFixed(2)}ms`);
+    } catch (error) {
+      console.error(`Solver failed: ${error.message}`);
+      return false;
+    }
+    console.log('-------------------------------');
+  }
+
+  // Analyze runtime growth
+  console.log("Analyzing runtime growth...");
+  for (let i = 1; i < results.length; i++) {
+    const previous = results[i - 1];
+    const current = results[i];
+    const runtimeGrowth = current.runtime / previous.runtime;
+
+    console.log(
+      `Variables: ${previous.numVariables} -> ${current.numVariables}, ` +
+        `Runtime: ${previous.runtime.toFixed(2)}ms -> ${current.runtime.toFixed(2)}ms, ` +
+        `Growth Factor: ${runtimeGrowth.toFixed(2)}`
+    );
+
+    if (runtimeGrowth > 2) {
+      console.warn("Runtime growth appears exponential. Likely P != NP.");
+      return false;
+    }
+  }
+
+  console.log("Runtime growth appears polynomial. P = NP might be true!");
+  return true;
+}
+
+// Run the benchmark
+testSATSolverWithRuntime();
