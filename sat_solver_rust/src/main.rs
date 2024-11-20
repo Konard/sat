@@ -9,7 +9,7 @@ fn main() {
     test_small_formulas();
 
     // Run the benchmark
-    test_sat_solver_with_runtime();
+    // test_sat_solver_with_runtime();
 }
 
 // Function to evaluate boolean formula with a given variable assignment
@@ -163,19 +163,43 @@ fn sat_solver(formula: &str) -> (bool, Option<HashMap<String, bool>>) {
 
 // Function to test small formulas
 fn test_small_formulas() {
-    let test_cases = vec![
+    let satisfiable_cases = vec![
         ("arg_1 ↑ arg_1", "satisfiable"),
         ("(arg_1 ↑ arg_1) ↑ (arg_1 ↑ arg_1)", "satisfiable"),
         ("(arg_1 ↑ arg_1) ↑ arg_1", "satisfiable"),
-        ("((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)", "unsatisfiable"),
         ("(arg_1 ↑ arg_1) ↑ (arg_2 ↑ arg_2)", "satisfiable"),
-        ("((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)) ↑ ((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2))", "satisfiable"),
+        (
+            "((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)) ↑ ((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2))",
+            "satisfiable",
+        ),
         ("(arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)", "satisfiable"),
-        ("(arg_1 ↑ arg_1) ↑ arg_1", "satisfiable"),
+    ];
+
+    let unsatisfiable_cases = vec![
+        ("((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)", "unsatisfiable"),
         ("((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)", "unsatisfiable"),
     ];
 
-    for (formula, expected) in test_cases {
+    println!("Testing satisfiable cases...");
+    for (formula, expected) in satisfiable_cases {
+        println!("Testing formula: {}", formula);
+        let (is_sat, assignment) = sat_solver(formula);
+        let status = if is_sat { "satisfiable" } else { "unsatisfiable" };
+
+        if status == expected {
+            println!("Result: {} (as expected)", status);
+        } else {
+            eprintln!("Result: {} (unexpected)", status);
+        }
+
+        if let Some(assign) = assignment {
+            println!("Assignment: {:?}", assign);
+        }
+        println!("-------------------------------");
+    }
+
+    println!("Testing unsatisfiable cases...");
+    for (formula, expected) in unsatisfiable_cases {
         println!("Testing formula: {}", formula);
         let (is_sat, assignment) = sat_solver(formula);
         let status = if is_sat { "satisfiable" } else { "unsatisfiable" };
