@@ -1,6 +1,6 @@
-use regex::Regex;
 use rand::seq::SliceRandom;
 use rand::Rng;
+use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::time::Instant;
 
@@ -9,19 +9,13 @@ fn main() {
     test_small_formulas();
 
     // Run the benchmark
-    // test_sat_solver_with_runtime();
+    test_sat_solver_with_runtime();
 }
 
 // Function to evaluate boolean formula with a given variable assignment
-fn evaluate_formula(
-    formula: &str,
-    assignment: &HashMap<String, bool>,
-) -> Result<bool, String> {
+fn evaluate_formula(formula: &str, assignment: &HashMap<String, bool>) -> Result<bool, String> {
     // Function to parse and evaluate the formula
-    fn parse_expression(
-        expr: &str,
-        assignment: &HashMap<String, bool>,
-    ) -> Result<bool, String> {
+    fn parse_expression(expr: &str, assignment: &HashMap<String, bool>) -> Result<bool, String> {
         let expr = expr.trim();
         let expr = strip_outer_parentheses(expr);
 
@@ -168,16 +162,50 @@ fn test_small_formulas() {
         ("(arg_1 ↑ arg_1) ↑ (arg_1 ↑ arg_1)", "satisfiable"),
         ("(arg_1 ↑ arg_1) ↑ arg_1", "satisfiable"),
         ("(arg_1 ↑ arg_1) ↑ (arg_2 ↑ arg_2)", "satisfiable"),
+        ("(arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)", "satisfiable"),
         (
             "((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)) ↑ ((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2))",
             "satisfiable",
         ),
-        ("(arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)", "satisfiable"),
+        (
+            "(((arg_1 ↑ arg_2) ↑ arg_1) ↑ (arg_2 ↑ arg_1)) ↑ (arg_2 ↑ (arg_1 ↑ arg_2))",
+            "satisfiable",
+        ),
+        (
+            "((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)) ↑ (arg_2 ↑ (arg_1 ↑ arg_1))",
+            "satisfiable",
+        ),
+        (
+            "(((arg_1 ↑ arg_2) ↑ arg_1) ↑ ((arg_2 ↑ arg_1) ↑ arg_2)) ↑ arg_1",
+            "satisfiable",
+        ),
+        (
+            "((arg_1 ↑ arg_1) ↑ arg_2) ↑ ((arg_1 ↑ arg_1) ↑ arg_2)",
+            "satisfiable",
+        ),
+        (
+            "((arg_1 ↑ arg_1) ↑ (arg_2 ↑ arg_2)) ↑ ((arg_1 ↑ arg_1) ↑ (arg_2 ↑ arg_2))",
+            "satisfiable",
+        ),
+        (
+            "((arg_1 ↑ arg_1) ↑ (arg_1 ↑ arg_1)) ↑ ((arg_1 ↑ arg_1) ↑ (arg_1 ↑ arg_1))",
+            "satisfiable",
+        ),
+        (
+            "(((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)",
+            "satisfiable",
+        ),
     ];
 
     let unsatisfiable_cases = vec![
-        ("((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)", "unsatisfiable"),
-        ("((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)", "unsatisfiable"),
+        (
+            "((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)",
+            "unsatisfiable",
+        ),
+        (
+            "(arg_1 ↑ (arg_1 ↑ arg_1)) ↑ (arg_1 ↑ (arg_1 ↑ arg_1))",
+            "unsatisfiable",
+        ),
     ];
 
     println!("Testing satisfiable cases...");
@@ -202,7 +230,11 @@ fn test_small_formulas() {
     for (formula, expected) in unsatisfiable_cases {
         println!("Testing formula: {}", formula);
         let (is_sat, assignment) = sat_solver(formula);
-        let status = if is_sat { "satisfiable" } else { "unsatisfiable" };
+        let status = if is_sat {
+            "satisfiable"
+        } else {
+            "unsatisfiable"
+        };
 
         if status == expected {
             println!("Result: {} (as expected)", status);
@@ -219,9 +251,7 @@ fn test_small_formulas() {
 
 // Function to generate a random formula
 fn generate_random_formula(num_variables: usize, num_operations: usize) -> String {
-    let variables: Vec<String> = (1..=num_variables)
-        .map(|i| format!("arg_{}", i))
-        .collect();
+    let variables: Vec<String> = (1..=num_variables).map(|i| format!("arg_{}", i)).collect();
     let mut literals = variables.clone();
     literals.extend(variables.iter().map(|v| format!("({} ↑ {})", v, v))); // Include negations
 
@@ -261,7 +291,11 @@ fn test_sat_solver_with_runtime() -> bool {
                 println!("Formula length: {} characters", formula.len());
                 println!(
                     "Result: {}",
-                    if satisfiable { "Satisfiable" } else { "Unsatisfiable" }
+                    if satisfiable {
+                        "Satisfiable"
+                    } else {
+                        "Unsatisfiable"
+                    }
                 );
                 println!("Runtime: {:.2}ms", runtime);
             }
