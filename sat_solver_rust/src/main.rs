@@ -164,59 +164,30 @@ fn sat_solver(formula: &str) -> (bool, Option<HashMap<String, bool>>) {
 // Function to test small formulas
 fn test_small_formulas() {
     let test_cases = vec![
-        TestCase {
-            formula: "arg_1 ↑ arg_1",
-            expected: "satisfiable",
-        },
-        TestCase {
-            formula: "(arg_1 ↑ arg_1) ↑ (arg_1 ↑ arg_1)",
-            expected: "satisfiable",
-        },
-        TestCase {
-            formula: "(arg_1 ↑ arg_1) ↑ arg_1",
-            expected: "satisfiable",
-        },
-        TestCase {
-            formula: "((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)",
-            expected: "unsatisfiable",
-        },
-        TestCase {
-            formula: "(arg_1 ↑ arg_1) ↑ (arg_2 ↑ arg_2)",
-            expected: "satisfiable",
-        },
-        TestCase {
-            formula: "((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)) ↑ ((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2))",
-            expected: "satisfiable",
-        },
-        TestCase {
-            formula: "(arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)",
-            expected: "satisfiable",
-        },
-        TestCase {
-            formula: "(arg_1 ↑ arg_1) ↑ arg_1",
-            expected: "satisfiable",
-        },
-        TestCase {
-            formula: "((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)",
-            expected: "unsatisfiable",
-        },
+        ("arg_1 ↑ arg_1", "satisfiable"),
+        ("(arg_1 ↑ arg_1) ↑ (arg_1 ↑ arg_1)", "satisfiable"),
+        ("(arg_1 ↑ arg_1) ↑ arg_1", "satisfiable"),
+        ("((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)", "unsatisfiable"),
+        ("(arg_1 ↑ arg_1) ↑ (arg_2 ↑ arg_2)", "satisfiable"),
+        ("((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)) ↑ ((arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2))", "satisfiable"),
+        ("(arg_1 ↑ arg_2) ↑ (arg_1 ↑ arg_2)", "satisfiable"),
+        ("(arg_1 ↑ arg_1) ↑ arg_1", "satisfiable"),
+        ("((arg_1 ↑ arg_1) ↑ arg_1) ↑ ((arg_1 ↑ arg_1) ↑ arg_1)", "unsatisfiable"),
     ];
 
-    for test_case in test_cases {
-        println!("Testing formula: {}", test_case.formula);
-        let result = sat_solver(test_case.formula);
-        let status = if result.0 { "satisfiable" } else { "unsatisfiable" };
+    for (formula, expected) in test_cases {
+        println!("Testing formula: {}", formula);
+        let (is_sat, assignment) = sat_solver(formula);
+        let status = if is_sat { "satisfiable" } else { "unsatisfiable" };
 
-        if status == test_case.expected {
+        if status == expected {
             println!("Result: {} (as expected)", status);
-            if let Some(assignment) = result.1 {
-                println!("Assignment: {:?}", assignment);
-            }
         } else {
             eprintln!("Result: {} (unexpected)", status);
-            if let Some(assignment) = result.1 {
-                eprintln!("Assignment: {:?}", assignment);
-            }
+        }
+
+        if let Some(assign) = assignment {
+            println!("Assignment: {:?}", assign);
         }
         println!("-------------------------------");
     }
